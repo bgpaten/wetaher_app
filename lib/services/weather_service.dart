@@ -1,19 +1,20 @@
 import 'dart:convert';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
-import '../models/wetaher_model.dart';
 import 'package:http/http.dart' as http;
+import 'package:project_1/models/wetaher_model.dart';
 
 class WeatherService {
-  static const BASE_URL = "https://api.openweathermap.org/data/2.5/weather";
-  final String apikey;
+  static const BASE_URL =
+      "https://api.openweathermap.org/data/2.5/weather"; // versi API diperbaiki
+  final String apiKey;
 
-  WeatherService(this.apikey);
+  WeatherService(this.apiKey);
 
   Future<Weather> getWeather(String cityName) async {
     try {
       final response = await http
-          .get(Uri.parse('$BASE_URL?q=$cityName&appid=$apikey&units=metric'));
+          .get(Uri.parse('$BASE_URL?q=$cityName&appid=$apiKey&units=metric'));
 
       if (response.statusCode == 200) {
         return Weather.fromJson(jsonDecode(response.body));
@@ -22,38 +23,38 @@ class WeatherService {
             'Failed to load weather data: ${response.reasonPhrase}');
       }
     } catch (e) {
-      throw Exception('Error occured while fetching weather data: $e');
+      throw Exception('Error occurred while fetching weather data: $e');
     }
   }
 
   Future<String> getCurrentCity() async {
     try {
-      // meminta izin lokasi
+      // Meminta izin lokasi
       LocationPermission permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
         if (permission == LocationPermission.denied) {
-          throw Exception('Location Permission are denied');
+          throw Exception('Location permissions are denied');
         }
       }
 
       if (permission == LocationPermission.deniedForever) {
         throw Exception(
-            'Location Permission are permanently denied, we cannot request permissions.');
+            'Location permissions are permanently denied, we cannot request permissions.');
       }
 
-      // mendapatkan posisi saat ini
+      // Mendapatkan posisi saat ini
       Position position = await Geolocator.getCurrentPosition(
           desiredAccuracy: LocationAccuracy.high);
 
-      // mengonversi koordinat saat ini
+      // Mengonversi koordinat ke daftar placemark
       List<Placemark> placemarks =
           await placemarkFromCoordinates(position.latitude, position.longitude);
 
-      // mengambil nama kota dari placemark pertama
+      // Mengambil nama kota dari placemark pertama
       String? city = placemarks[0].locality;
 
-      return city ?? "Unknown city";
+      return city ?? "Unknown City";
     } catch (e) {
       throw Exception('Error occurred while fetching city name: $e');
     }

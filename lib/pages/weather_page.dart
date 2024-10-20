@@ -49,7 +49,7 @@ class _WeatherPageState extends State<WeatherPage> {
       case 'thunderstorm':
         return 'assets/petir.json';
       case 'clear':
-        return 'assest/cerah.json';
+        return 'assets/cerah.json';
       default:
         return 'assets/cerah.json';
     }
